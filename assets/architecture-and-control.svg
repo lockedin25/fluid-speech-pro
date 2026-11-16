@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="840" height="400" viewBox="0 0 840 400" fill="none">
+  <rect width="840" height="400" rx="16" fill="#0D1117"/>
+  <rect x="0.5" y="0.5" width="839" height="399" rx="15.5" stroke="#262D38"/>
+
+  <!-- Section 1: No Double LLM Processing -->
+  <text x="32" y="40" fill="#F0F6FC" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="18" font-weight="700">Built for LLM Workflows: No Double Post-Processing</text>
+  <text x="32" y="62" fill="#8B949E" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5">If you dictate into Claude Code, Cursor, or ChatGPT, an LLM is already reading your text. A second rewrite pass just adds delay.</text>
+
+  <!-- Cloud / Wispr Row -->
+  <text x="32" y="96" fill="#F0883E" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" font-weight="600">CLOUD DICTATION + LLM</text>
+  <rect x="32" y="106" width="136" height="40" rx="8" fill="#161B22" stroke="#30363D"/>
+  <text x="100" y="131" text-anchor="middle" fill="#E6EDF3" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="600">Voice Audio</text>
+
+  <path d="M174 126H196" stroke="#484F58" stroke-width="2" stroke-linecap="round"/>
+  <path d="M192 121L198 126L192 131" stroke="#484F58" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <rect x="204" y="106" width="166" height="40" rx="8" fill="#161B22" stroke="#30363D"/>
+  <text x="287" y="131" text-anchor="middle" fill="#E6EDF3" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="600">Cloud Transcription</text>
+
+  <path d="M376 126H398" stroke="#484F58" stroke-width="2" stroke-linecap="round"/>
+  <path d="M394 121L400 126L394 131" stroke="#484F58" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <rect x="406" y="106" width="184" height="40" rx="8" fill="#2B1D12" stroke="#D29922"/>
+  <text x="498" y="124" text-anchor="middle" fill="#F0883E" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" font-weight="700">LLM Layer #1 (Cleanup)</text>
+  <text x="498" y="139" text-anchor="middle" fill="#C9A26D" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5">Extra latency + rewrites words</text>
+
+  <path d="M596 126H618" stroke="#484F58" stroke-width="2" stroke-linecap="round"/>
+  <path d="M614 121L620 126L614 131" stroke="#484F58" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <rect x="626" y="106" width="182" height="40" rx="8" fill="#161B22" stroke="#30363D"/>
+  <text x="717" y="124" text-anchor="middle" fill="#E6EDF3" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" font-weight="600">LLM Layer #2 (Your Tool)</text>
+  <text x="717" y="139" text-anchor="middle" fill="#8B949E" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5">Claude Code / Cursor / Chat</text>
+
+  <!-- Fluid Row -->
+  <text x="32" y="176" fill="#3FB950" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" font-weight="600">FLUID DICTATION + LLM</text>
+  <rect x="32" y="186" width="136" height="40" rx="8" fill="#161B22" stroke="#30363D"/>
+  <text x="100" y="211" text-anchor="middle" fill="#E6EDF3" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="600">Voice Audio</text>
+
+  <path d="M174 206H196" stroke="#238636" stroke-width="2" stroke-linecap="round"/>
+  <path d="M192 201L198 206L192 211" stroke="#238636" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <rect x="204" y="186" width="230" height="40" rx="8" fill="#0F261A" stroke="#238636"/>
+  <text x="319" y="204" text-anchor="middle" fill="#3FB950" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" font-weight="700">Local 8-bit MLX + Word Boost</text>
+  <text x="319" y="219" text-anchor="middle" fill="#8B949E" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5">On-device · ~0.8s · raw transcript</text>
+
+  <path d="M440 206H462" stroke="#238636" stroke-width="2" stroke-linecap="round"/>
+  <path d="M458 201L464 206L458 211" stroke="#238636" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <rect x="470" y="186" width="338" height="40" rx="8" fill="#122136" stroke="#388BFD"/>
+  <text x="639" y="204" text-anchor="middle" fill="#58A6FF" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" font-weight="700">Direct to Your LLM (Claude Code / Cursor)</text>
+  <text x="639" y="219" text-anchor="middle" fill="#8B949E" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="10.5">Single LLM pass · exact spoken intent preserved</text>
+
+  <!-- Divider -->
+  <line x1="32" y1="248" x2="808" y2="248" stroke="#21262D"/>
+
+  <!-- Section 2: Complete Control Over Your Language -->
+  <text x="32" y="276" fill="#F0F6FC" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="16" font-weight="700">Complete Control Over Your Language</text>
+  <text x="32" y="296" fill="#8B949E" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12">Edit one local JSON file to boost project names, people, and acronyms in beam decoding. Reloads live on the next run.</text>
+
+  <!-- Left JSON card -->
+  <rect x="32" y="310" width="380" height="72" rx="8" fill="#161B22" stroke="#30363D"/>
+  <text x="46" y="329" fill="#8B949E" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11">vocabulary/active-boost.json</text>
+  <text x="46" y="348" fill="#79C0FF" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11">"Parakeet": 0.8,  "MLX": 0.6,  "Claude Code": 0.9,</text>
+  <text x="46" y="366" fill="#79C0FF" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11">"API": 0.35,  "YourTeamMate": 1.0</text>
+
+  <!-- Right Control Points -->
+  <rect x="428" y="310" width="380" height="72" rx="8" fill="#161B22" stroke="#30363D"/>
+  <text x="444" y="331" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12"><tspan fill="#3FB950" font-weight="600">• 100% Local &amp; Private: </tspan><tspan fill="#C9D1D9">No audio or text leaves your Mac</tspan></text>
+  <text x="444" y="351" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12"><tspan fill="#3FB950" font-weight="600">• Tunable Bias: </tspan><tspan fill="#C9D1D9">Weights 0.1–2.0 + beam size 1–5</tspan></text>
+  <text x="444" y="371" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12"><tspan fill="#3FB950" font-weight="600">• Zero Restart: </tspan><tspan fill="#C9D1D9">Edits apply on the next dictation</tspan></text>
+</svg>

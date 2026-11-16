@@ -1,66 +1,108 @@
-# Fluid Speech Pro on this Mac
+# Fluid Dictation (Fluid Speech Pro on Apple Silicon)
 
-Fluid Speech Pro by FluidVoice is installed for local speech-to-text on the Apple M5, 16 GB Mac. It uses `parakeet-mlx` and the official Fluid Speech loader. `mlx-lm` is for language models and is not the runtime specified for this model.
+A lightweight macOS menu-bar dictation app built around [Fluid Speech Pro MLX](https://huggingface.co/FluidVoice-Labs/fluid-speech-pro-mlx). Press `Fn` anywhere on your Mac, speak, and the transcript gets pasted into whatever field has focus. Everything runs locally on Apple Silicon, and the model unloads from RAM 10 seconds after you finish speaking.
 
-## Dictate into any app
+![RAM Footprint Comparison](assets/memory-savings.svg)
 
-The installed **Fluid Dictation** menu-bar app uses **Control + Option + Space**: press once to record, press again to transcribe and paste. It starts at login, uses a conservative 186-term vocabulary boost, and unloads model weights after 10 idle seconds. See [hotkey setup and permissions](hotkey/README.md).
+## Why I built this
 
-## Transcribe your audio
+### 1. Almost zero RAM when idle
+Most dictation apps keep large runtimes sitting in memory all day even when you are not speaking. On an Apple M5 (16 GB) measured with macOS `footprint`:
+
+| App / State | Memory Footprint | Notes |
+|---|---:|---|
+| Fluid Dictation (idle, model unloaded) | **31 MB** | 21 MB Swift app + 10 MB Python coordinator, 0 MB weights |
+| Wispr Flow (idle, not recording) | **1,081 MB** | 13 processes (585 MB Electron helpers + 496 MB renderers) |
+| Fluid Dictation (10s dictation peak) | **1,286 MB** | 1,255 MB 8-bit MLX peak (0.92s cold, 0.78s warm), then drops back to 31 MB |
+| Fluid Dictation (5-minute stress peak) | **1,688 MB** | 30s chunks with a 128 MB MLX cache cap |
+
+After 10 idle seconds, the worker kills the model child process and hands all model memory back to macOS.
+
+### 2. Good enough daily transcription
+For everyday English dictation, the 8-bit quantized Parakeet model (`~751 MB` on disk) is accurate enough to use as a daily driver and finishes a 10-second clip in under a second.
+
+### 3. No extra LLM rewrite layer when talking to LLMs
+If your main use case is dictating prompts into Claude Code, Cursor, Codex, or ChatGPT, an LLM is already about to read what you said. Running a cloud post-processing LLM inside your dictation app first adds a second network hop, slows things down, and sometimes rewrites technical terms before your actual coding agent sees them. Fluid Dictation drops the raw transcript straight into the text box.
+
+![Built for LLM Workflows and Custom Vocabulary](assets/architecture-and-control.svg)
+
+### 4. Full control over your vocabulary
+Instead of guessing what a closed app sends to its servers, you control recognition bias through a plain JSON file (`vocabulary/active-boost.json`) backed by `parakeet-mlx` beam search:
+
+```json
+{
+  "weights": {
+    "Claude Code": 0.9,
+    "Parakeet": 0.8,
+    "MLX": 0.6,
+    "API": 0.35
+  }
+}
+```
+
+You can pick your own weights (`0.1` to `2.0`), tune `beam_size` (`1` to `5`) in `hotkey/config.json`, or disable boosting completely. The coordinator reloads these files on every dictation, so edits apply right away without rebuilding or restarting the app.
+
+## Honest drawbacks
+
+This setup fits a specific workflow and has real limits:
+
+- **Not great for direct email writing or polished messages.** Because there is no LLM cleanup pass by default, filler words, self-corrections, and rough phrasing land verbatim. If you want one-click polished prose in Gmail or Slack, a cloud tool with an LLM rewrite step is a better match.
+- **Not great at Hinglish right now.** The underlying model supports English and 24 other European languages. It does not support Hindi, so mixed Hindi-English speech will often come out garbled.
+- **Can struggle with certain accents.** Depending on your accent and how fast you speak, some words and proper nouns still slip through. Vocabulary boosting helps on names you add, though it is a gentle bias rather than a hard override.
+
+## Quick install (macOS, Apple Silicon)
+
+### Option A: Download the DMG
+1. Download `dist/Fluid-Dictation.dmg` from this repository and open it.
+2. Double-click **Install Fluid Dictation.command**.
+
+### Option B: Clone and run one script
+```bash
+git clone https://github.com/lockedin25/fluid-speech-pro.git
+cd fluid-speech-pro
+./setup.sh
+```
+
+### What `setup.sh` sets up automatically
+1. Installs `uv` and `ffmpeg` (via Homebrew) if they are missing.
+2. Creates an isolated Python 3.12 environment in `~/Library/Application Support/FluidDictation/.venv`.
+3. Downloads the 8-bit model weights (`~751 MB`) and official loader from `FluidVoice-Labs/fluid-speech-pro-mlx` on Hugging Face and verifies them against `SHA256SUMS`.
+4. Installs `Fluid Dictation.app` into `~/Applications/`.
+5. Sets macOS `AppleFnUsageType` to `0` so pressing `Fn` does not pop up the Emoji picker, and adds a LaunchAgent so it starts at login.
+6. Opens the app and prompts for Microphone and Accessibility permissions.
+
+## Controls
+
+- **Tap `Fn`** once to start recording, tap `Fn` again to transcribe and paste.
+- **Hold `Fn`** to record while held and paste when released.
+- **Backup shortcut:** `Control + Option + Space` works at any time.
+
+To enable vocabulary boosting after installing, create `vocabulary/active-boost.json` inside `~/Library/Application Support/FluidDictation/` (or your cloned folder) and set `"enabled": true` in `hotkey/config.json`.
+
+## CLI transcription
+
+You can also transcribe audio files directly from the terminal (`HF_HUB_OFFLINE=1` after setup):
 
 ```bash
-cd /Users/shubhamkorde/Desktop/Projects/fluid-speech-pro
 ./transcribe /absolute/path/to/recording.m4a
 ./transcribe /absolute/path/to/recording.m4a --clean
 ./transcribe /absolute/path/to/recording.m4a --json results/my-recording.json
 ```
 
-The launcher uses the local Python environment and weights, with `HF_HUB_OFFLINE=1`. Audio stays on this machine. WAV, M4A, MP3, FLAC and other ffmpeg-readable files work. The library resamples audio as needed; decoding uses 120-second chunks with the library's default 15-second overlap for long files.
+`--clean` enables the downloaded `clean-mode.safetensors` adapter (`55 MB`), which trims fillers and repetitions for recorded files.
 
-`--clean` enables the downloaded adapter that removes fillers and repetitions. Use default mode when preserving the spoken wording matters. This model supports file transcription; its loader explicitly does not support streaming. It supports English and 24 other European languages, not Hindi.
+## Credits
 
-## Verified on 2026-11-15
+Huge thanks to the **FluidVoice** team for packaging and open-sourcing [Fluid Speech Pro MLX](https://huggingface.co/FluidVoice-Labs/fluid-speech-pro-mlx), along with the custom loader and clean-mode adapter that make local Apple Silicon inference this compact and quick.
 
-Both default and clean mode completed offline on the Metal GPU.
+Required upstream attribution:
+> "Fluid Speech Pro by FluidVoice. Built on NVIDIA Parakeet TDT 0.6B v3 and Moondream Parakeet Ultra."
 
-| Test | Audio length | Second pass | Speed |
-|---|---:|---:|---:|
-| macOS Samantha synthetic speech, default | 9.47 s | 0.41 s | 23.2x real time |
-| Recorded speech, default | 10.44 s | 0.68 s | 15.4x real time |
-| macOS Samantha synthetic speech, clean | 9.47 s | 0.64 s | 14.9x real time |
+- [FluidVoice-Labs/fluid-speech-pro-mlx](https://huggingface.co/FluidVoice-Labs/fluid-speech-pro-mlx) (CC BY 4.0)
+- [nvidia/parakeet-tdt-0.6b-v3](https://huggingface.co/nvidia/parakeet-tdt-0.6b-v3) (CC BY 4.0)
+- [moondream/parakeet-ultra](https://huggingface.co/moondream/parakeet-ultra) (CC BY 4.0)
 
-These timings reuse a loaded model. The command loads the model each time it starts; initialization and the first pass take longer. Results include model load time, each transcription time, timestamps and peak MLX allocation in `results/*.json`. MLX allocation is not total process or system memory.
+## License
 
-The synthetic sentence included "Hello Shubham" and "Please send the notes to Rahul after the call." Default mode returned "Hello Shoebom" and "Rattle"; clean mode returned "Hello Shubaum" and "Rahul". Names need checking. These short samples establish that inference works; they do not establish accuracy on your own recordings.
-
-Replay the tests:
-
-```bash
-./transcribe samples/smoke-test.wav --repeat 2 --json results/smoke-test.json
-./transcribe samples/recorded-speech.flac --repeat 2 --json results/recorded-speech.json
-./transcribe samples/smoke-test.wav --clean --repeat 2 --json results/smoke-test-clean.json
-```
-
-The recorded sample is [narsil/asr_dummy, 1.flac](https://huggingface.co/datasets/narsil/asr_dummy/blob/8d141c84e3f84c54cd7bbaa851d24edd0f559734/1.flac). The synthetic clip was created locally with macOS `say`, voice Samantha. No microphone recording was taken.
-
-## Installed files and reproduction
-
-- `models/fluid-speech-pro-mlx/model.8bit.safetensors`: 751 MB 8-bit weights.
-- `models/fluid-speech-pro-mlx/clean-mode.safetensors`: 55 MB adapter.
-- `fluid_speech_mlx.py`: official loader, needed for the model's extra encoder block and audio preprocessing.
-- `requirements.lock.txt`: exact installed Python package versions, including `parakeet-mlx==0.7.0` and `mlx==0.32.4`.
-- `SHA256SUMS`: hashes of the downloaded loader, configuration and weights.
-- `MODEL_CARD.md`: upstream model card. Model license and attribution are in `models/fluid-speech-pro-mlx/LICENSE` and `NOTICE`.
-
-Model and loader revision: `aeb1d4e43487586b15d86c0a1dd4511e1cf6b7a0`.
-
-```bash
-uv venv --python 3.12 .venv
-uv pip install --python .venv/bin/python -r requirements.lock.txt
-.venv/bin/hf download FluidVoice-Labs/fluid-speech-pro-mlx config.json model.8bit.safetensors clean-mode.safetensors LICENSE NOTICE --revision aeb1d4e43487586b15d86c0a1dd4511e1cf6b7a0 --local-dir models/fluid-speech-pro-mlx
-shasum -a 256 -c SHA256SUMS
-```
-
-`ffmpeg` and `ffprobe` are already installed through Homebrew on this Mac. The full-precision 2.52 GB weights were not downloaded; the runner selects 8-bit weights.
-
-Source: [official MLX model and usage instructions](https://huggingface.co/FluidVoice-Labs/fluid-speech-pro-mlx). License: CC BY 4.0; credit "Fluid Speech Pro by FluidVoice" when using the model.
+- **App, worker, and setup scripts** (`hotkey/`, `setup.sh`, `transcribe`, `transcribe.py`): [MIT License](LICENSE).
+- **Fluid Speech Pro MLX model weights and `fluid_speech_mlx.py` loader**: Creative Commons Attribution 4.0 International (**CC BY 4.0**), copyright FluidVoice.

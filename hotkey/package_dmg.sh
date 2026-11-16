@@ -34,6 +34,8 @@ cp "$ROOT/requirements.lock.txt" "$STAGE/payload/"
 cp "$ROOT/SHA256SUMS" "$STAGE/payload/"
 cp "$ROOT/MODEL_CARD.md" "$STAGE/payload/"
 cp "$ROOT/README.md" "$STAGE/payload/"
+cp "$ROOT/LICENSE" "$STAGE/payload/"
+cp "$ROOT/LICENSE" "$STAGE/LICENSE"
 
 cp "$ROOT/hotkey/worker.py" "$STAGE/payload/hotkey/"
 cp "$ROOT/hotkey/inference.py" "$STAGE/payload/hotkey/"
