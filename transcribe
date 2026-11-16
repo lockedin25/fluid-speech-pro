@@ -1,0 +1,5 @@
+#!/bin/zsh
+set -eu
+TASK_DIR="${0:A:h}"
+export HF_HUB_OFFLINE=1
+exec "$TASK_DIR/.venv/bin/python" "$TASK_DIR/transcribe.py" "$@"

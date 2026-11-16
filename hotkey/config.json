@@ -1,0 +1,8 @@
+{
+  "idle_unload_seconds": 10,
+  "vocabulary_boost": {
+    "enabled": true,
+    "beam_size": 2,
+    "terms_file": "vocabulary/active-boost.json"
+  }
+}

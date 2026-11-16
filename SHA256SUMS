@@ -1,0 +1,4 @@
+a895beec91f927837e48e1db8824dc1d226a29847e053cbf1f85118919a15559  fluid_speech_mlx.py
+c79978692bc5c24bcbfa07032fa4ba75de3846b6cd86ee630673158671312b69  models/fluid-speech-pro-mlx/config.json
+2a09ae3033356b3acd9b782da5183f80609806169e10629dcc38bca766a98ca7  models/fluid-speech-pro-mlx/model.8bit.safetensors
+2cb0b3db9a4458f32055cb38e14b9578409e674dc620d4b68afab58ef99afa4d  models/fluid-speech-pro-mlx/clean-mode.safetensors

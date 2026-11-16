@@ -1,0 +1,18 @@
+# Local runtime, virtual environment, and downloaded MLX weights
+.venv/
+models/
+__pycache__/
+*.pyc
+.DS_Store
+
+# Personal vocabulary, local test outputs, and runtime state
+vocabulary/
+cleanup/
+fine-tuning/
+results/
+samples/
+hotkey/status.json
+hotkey/model-state.json
+hotkey/FluidDictation.swift.bak
+hotkey/*.json
+!hotkey/config.json
