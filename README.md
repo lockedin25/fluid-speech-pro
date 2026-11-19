@@ -76,7 +76,7 @@ cd fluid-speech-pro
 - **Tap `Fn`** once to start recording, tap `Fn` again to transcribe and paste.
 - **Hold `Fn`** to record while held and paste when released.
 - **Backup shortcut:** `Control + Option + Space` works at any time.
-- **Tap `Option`** while recording (or transcribing) to paste a polite, cleaned-up rewrite instead of the raw transcript. Opt-in per dictation; it makes one Gemini Flash-Lite call (about 0.5 to 0.8 s) and needs a key in `~/.config/fluid-dictation/gemini-api-key` or `$GEMINI_API_KEY`. If the call fails, the raw text is pasted.
+- **Double-tap `Fn` to stop** (or tap `Fn` again while it says "Transcribing") to paste a polite, cleaned-up rewrite instead of the raw transcript. Opt-in per dictation; it makes one Gemini Flash-Lite call (about 0.5 to 0.8 s) and needs a key in `~/.config/fluid-dictation/gemini-api-key` or `$GEMINI_API_KEY`. If the call fails, the raw text is pasted.
 
 To enable vocabulary boosting after installing, create `vocabulary/active-boost.json` inside `~/Library/Application Support/FluidDictation/` (or your cloned folder) and set `"enabled": true` in `hotkey/config.json`.
 
