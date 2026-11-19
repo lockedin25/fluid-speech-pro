@@ -36,5 +36,11 @@ Third-Party Model & Loader Notice
    - NVIDIA Parakeet TDT 0.6B v3 (CC BY 4.0, NVIDIA Corporation)
    - Moondream Parakeet Ultra (CC BY 4.0, Moondream)
 
-2. Python dependencies listed in `requirements.lock.txt` (including `mlx` and
+2. Rumble-2-Flash (8-bit MLX) Model Weights (downloaded by setup)
+   Source: https://huggingface.co/TypeWhisper/Rumble-2-Flash-8bit
+   Upstream: https://huggingface.co/Reson8/Rumble-2-Flash
+   License: Apache License 2.0
+
+3. Python dependencies listed in `requirements.lock.txt` and
+   `requirements-rumble.lock.txt` (including `mlx`, `mlx-audio`, and
    `parakeet-mlx`) remain under their respective upstream open-source licenses.

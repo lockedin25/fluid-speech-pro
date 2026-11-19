@@ -1,5 +1,6 @@
 # Local runtime, virtual environment, and downloaded MLX weights
 .venv/
+.venv-rumble/
 models/
 __pycache__/
 *.pyc

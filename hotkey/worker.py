@@ -10,27 +10,78 @@ import sys
 import time
 
 ROOT = Path(__file__).resolve().parent
+PROJECT_ROOT = ROOT.parent
 CONFIG = Path(os.environ.get('FLUID_CONFIG_PATH', ROOT / 'config.json'))
 STATE = Path(os.environ.get('FLUID_MODEL_STATE_PATH', ROOT / 'model-state.json'))
 child = None
+loaded_model = None
 last_completed = None
+
+FLUID_ALIASES = {'fluid-speech', 'fluid_speech', 'fluid', 'fluid-speech-pro', 'fluid_speech_pro', 'parakeet'}
+RUMBLE_ALIASES = {'rumble-2-flash', 'rumble_2_flash', 'rumble'}
 
 
 def emit(**message):
     print(json.dumps(message), flush=True)
 
 
+def read_config():
+    try:
+        data = json.loads(CONFIG.read_text())
+        return data if isinstance(data, dict) else {}
+    except (OSError, ValueError, TypeError):
+        return {}
+
+
+def normalize_model(value):
+    raw = str(value or 'rumble-2-flash').strip().lower()
+    if raw in FLUID_ALIASES:
+        return 'fluid-speech'
+    if raw in RUMBLE_ALIASES:
+        return 'rumble-2-flash'
+    raise ValueError(f'Unknown model {value!r}. Expected "rumble-2-flash" or "fluid-speech".')
+
+
+def configured_model():
+    cfg = read_config()
+    raw = (
+        os.environ.get('FLUID_MODEL')
+        or os.environ.get('FLUID_BACKEND')
+        or cfg.get('model')
+        or cfg.get('backend')
+        or 'rumble-2-flash'
+    )
+    return normalize_model(raw)
+
+
+def python_for_model(model_name):
+    if model_name == 'rumble-2-flash':
+        candidate = PROJECT_ROOT / '.venv-rumble/bin/python'
+        if candidate.is_file():
+            return str(candidate)
+    else:
+        candidate = PROJECT_ROOT / '.venv/bin/python'
+        if candidate.is_file():
+            return str(candidate)
+    return sys.executable
+
+
 def idle_seconds():
     try:
-        value = float(json.loads(CONFIG.read_text())['idle_unload_seconds'])
+        value = float(read_config()['idle_unload_seconds'])
         return value if math.isfinite(value) and 0 <= value <= 3600 else 10.0
-    except (OSError, ValueError, KeyError, TypeError):
+    except (ValueError, KeyError, TypeError):
         return 10.0
 
 
 def state(loaded, **extra):
+    try:
+        current_model = loaded_model if loaded else configured_model()
+    except ValueError:
+        current_model = None
     STATE.write_text(json.dumps({
         'model_loaded': loaded,
+        'model': current_model,
         'model_pid': child.pid if loaded and child is not None else None,
         'idle_unload_seconds': idle_seconds(),
         'updated_at': time.time(), **extra,
@@ -38,9 +89,10 @@ def state(loaded, **extra):
 
 
 def unload():
-    global child, last_completed
+    global child, loaded_model, last_completed
     process = child
     child = None
+    loaded_model = None
     last_completed = None
     # Do not re-enter cleanup if Quit arrives during the idle timeout's wait.
     previous = signal.pthread_sigmask(signal.SIG_BLOCK, {signal.SIGTERM, signal.SIGINT})
@@ -80,18 +132,21 @@ def read_child(timeout):
 
 
 def ensure_loaded():
-    global child
-    if child is not None and child.poll() is None:
+    global child, loaded_model
+    model_name = configured_model()
+    if child is not None and child.poll() is None and loaded_model == model_name:
         return
     unload()
+    env = dict(os.environ, FLUID_MODEL=model_name, FLUID_BACKEND=model_name)
     child = subprocess.Popen(
-        [sys.executable, '-u', str(ROOT / 'inference.py')],
+        [python_for_model(model_name), '-u', str(ROOT / 'inference.py')],
         stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True,
-        start_new_session=True,
+        start_new_session=True, env=env,
     )
     message = read_child(45)
     if message.get('status') != 'ready':
         raise RuntimeError(message.get('message', 'Model failed to load'))
+    loaded_model = model_name
     state(True)
 
 

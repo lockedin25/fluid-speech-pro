@@ -31,12 +31,14 @@ cp "$ROOT/transcribe.py" "$STAGE/payload/"
 cp "$ROOT/transcribe" "$STAGE/payload/"
 chmod +x "$STAGE/payload/transcribe"
 cp "$ROOT/requirements.lock.txt" "$STAGE/payload/"
+cp "$ROOT/requirements-rumble.lock.txt" "$STAGE/payload/"
 cp "$ROOT/SHA256SUMS" "$STAGE/payload/"
 cp "$ROOT/MODEL_CARD.md" "$STAGE/payload/"
 cp "$ROOT/README.md" "$STAGE/payload/"
 cp "$ROOT/LICENSE" "$STAGE/payload/"
 cp "$ROOT/LICENSE" "$STAGE/LICENSE"
 
+cp "$ROOT/hotkey/config.json" "$STAGE/payload/hotkey/"
 cp "$ROOT/hotkey/worker.py" "$STAGE/payload/hotkey/"
 cp "$ROOT/hotkey/inference.py" "$STAGE/payload/hotkey/"
 cp "$ROOT/hotkey/vocabulary_boost.py" "$STAGE/payload/hotkey/"
@@ -53,8 +55,8 @@ One-step install:
 
 What setup.sh does automatically:
   1. Installs uv & ffmpeg if missing
-  2. Creates a Python 3.12 environment in ~/Library/Application Support/FluidDictation
-  3. Downloads & SHA256-verifies the 8-bit Fluid Speech Pro MLX model (~750 MB)
+  2. Creates isolated Python 3.12 environments in ~/Library/Application Support/FluidDictation
+  3. Downloads local 8-bit MLX speech models (Rumble-2-Flash & Fluid Speech Pro)
   4. Installs Fluid Dictation.app to ~/Applications/Fluid Dictation.app
   5. Disables the macOS Fn Emoji picker and enables launch at login
   6. Launches the app and prompts for Microphone + Accessibility permissions

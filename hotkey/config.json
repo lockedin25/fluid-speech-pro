@@ -1,5 +1,13 @@
 {
+  "model": "rumble-2-flash",
   "idle_unload_seconds": 10,
+  "rumble_2_flash": {
+    "model_path": "models/rumble-2-flash-8bit",
+    "language": null,
+    "system_prompt": "<digits><nofiller><verbatim>",
+    "chunk_duration": 30.0,
+    "use_hotwords": false
+  },
   "vocabulary_boost": {
     "enabled": true,
     "beam_size": 2,

@@ -2,4 +2,31 @@
 set -eu
 TASK_DIR="${0:A:h}"
 export HF_HUB_OFFLINE=1
-exec "$TASK_DIR/.venv/bin/python" "$TASK_DIR/transcribe.py" "$@"
+
+MODEL=""
+for ((i=1; i<=$#; i++)); do
+  arg="${@[i]}"
+  if [[ ( "$arg" == "--model" || "$arg" == "--backend" ) && $((i+1)) -le $# ]]; then
+    MODEL="${@[i+1]}"
+    break
+  elif [[ "$arg" == --model=* ]]; then
+    MODEL="${arg#--model=}"
+    break
+  elif [[ "$arg" == --backend=* ]]; then
+    MODEL="${arg#--backend=}"
+    break
+  fi
+done
+
+if [[ -z "$MODEL" && -f "$TASK_DIR/hotkey/config.json" ]]; then
+  MODEL=$(/usr/bin/python3 -c 'import json,sys; d=json.load(open(sys.argv[1])); print(d.get("model") or d.get("backend") or "rumble-2-flash")' "$TASK_DIR/hotkey/config.json" 2>/dev/null || echo "rumble-2-flash")
+fi
+MODEL="${(L)MODEL:-rumble-2-flash}"
+
+if [[ "$MODEL" == "fluid-speech" || "$MODEL" == "fluid_speech" || "$MODEL" == "fluid" || "$MODEL" == "fluid-speech-pro" || "$MODEL" == "fluid_speech_pro" || "$MODEL" == "parakeet" ]]; then
+  PYTHON_BIN="$TASK_DIR/.venv/bin/python"
+else
+  PYTHON_BIN="$TASK_DIR/.venv-rumble/bin/python"
+fi
+
+exec "$PYTHON_BIN" "$TASK_DIR/transcribe.py" "$@"
